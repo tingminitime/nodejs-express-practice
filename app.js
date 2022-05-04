@@ -69,4 +69,6 @@ app.use(function (err, req, res, next) {
   )
 })
 
+console.log(process.env.NODE_ENV)
+
 module.exports = app

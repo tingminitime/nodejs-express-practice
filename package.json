@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development PORT=3005 nodemon ./bin/www",
     "staging": "cross-env NODE_ENV=production nodemon ./bin/www",
-    "start": "node ./bin/www"
+    "start": "NODE_ENV=production node ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
