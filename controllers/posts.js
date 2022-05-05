@@ -149,6 +149,10 @@ exports.createNewPostHandler = async (req, res, next) => {
  */
 exports.deletePostHandler = async (req, res, next) => {
   const { params } = req
+  if (req.originalUrl === (req.baseUrl + req.path)) {
+    errorHandler(res, 404, `Delete unsuccessfully, no Id exist.`)
+    return
+  }
 
   // Delete all posts
   if (!params.postId) {
