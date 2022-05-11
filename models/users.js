@@ -1,9 +1,16 @@
 const mongoose = require('mongoose')
+const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+
 const { Schema } = mongoose
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 const schemaOptions = {
   collection: 'users',
   versionKey: false,
+  timestamps: true,
 }
 
 const userSchema = new Schema({
@@ -21,7 +28,11 @@ const userSchema = new Schema({
   avatar: {
     type: String,
     default: '',
-  }
+  },
+  createdAtTw: {
+    type: String,
+    default: () => dayjs(Date.now()).tz('Asia/Taipei').format()
+  },
 }, schemaOptions)
 
 const User = mongoose.model('users', userSchema)

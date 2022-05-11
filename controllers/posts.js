@@ -1,4 +1,5 @@
 const Post = require('../models/posts')
+const User = require('../models/users')
 const { errorHandler, successHandler, schemaErrorHandler } = require('../utils/responseHandler')
 
 /**
@@ -11,7 +12,12 @@ exports.getPostHandler = async (req, res, next) => {
   // If params has Id, return single post data
   if (params.postId) {
     try {
-      const post = await Post.findById(params.postId)
+      const post = await Post
+        .findById(params.postId)
+        .populate({
+          path: 'user',
+          select: 'name avatar',
+        })
       // Maybe mongoDB will return success message but null result
       if (post) {
         successHandler(res, 200, post)
@@ -35,14 +41,18 @@ exports.getPostHandler = async (req, res, next) => {
   else if (query.pageSize && query.currentPage) {
     const count = await Post.count({})
     const sort = query.descending ? -1 : 1
+    // Keywords search
     if (query.keyword) {
-      // const keyword = new RegExp(query.keyword) || ''
       try {
         const posts = await Post
           .find({ content: { $regex: query.keyword } })
           .skip(query.pageSize * (query.currentPage - 1))
           .limit(query.pageSize)
           .sort({ createdAt: sort })
+          .populate({
+            path: 'user',
+            select: 'name avatar',
+          })
 
         successHandler(
           res,
@@ -64,6 +74,7 @@ exports.getPostHandler = async (req, res, next) => {
         )
       }
     }
+    // No keywords search
     else {
       try {
         const posts = await Post
@@ -71,6 +82,10 @@ exports.getPostHandler = async (req, res, next) => {
           .skip(query.pageSize * (query.currentPage - 1))
           .limit(query.pageSize)
           .sort({ createdAt: sort })
+          .populate({
+            path: 'user',
+            select: 'name avatar',
+          })
 
         successHandler(
           res,
@@ -119,7 +134,8 @@ exports.createNewPostHandler = async (req, res, next) => {
 
   try {
     const newPost = await Post.create({
-      name: reqData.name,
+      // name: reqData.name,
+      user: reqData.user,
       tags: reqData.tags,
       type: reqData.type,
       image: reqData.image,
@@ -149,7 +165,7 @@ exports.createNewPostHandler = async (req, res, next) => {
  */
 exports.deletePostHandler = async (req, res, next) => {
   const { params } = req
-  if (req.originalUrl === (req.baseUrl + req.path)) {
+  if (req.originalUrl === (req.baseUrl + '/')) {
     errorHandler(res, 404, `Delete unsuccessfully, no Id exist.`)
     return
   }
@@ -181,10 +197,10 @@ exports.deletePostHandler = async (req, res, next) => {
         res,
         200,
         deletePost,
-        `Delete one post: ${deletePost.name} ${deletePost._id}`,
+        `Delete one post: userId: ${deletePost.user} postId:${deletePost._id}`,
         {
-          id: deletePost._id,
-          name: deletePost.name
+          userId: deletePost.user,
+          postId: deletePost._id,
         }
       )
     } catch (error) {
