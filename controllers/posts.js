@@ -16,7 +16,7 @@ exports.getPostHandler = async (req, res, next) => {
         .findById(params.postId)
         .populate({
           path: 'user',
-          select: 'name avatar',
+          select: 'userName avatar'
         })
       // Maybe mongoDB will return success message but null result
       if (post) {
@@ -51,7 +51,7 @@ exports.getPostHandler = async (req, res, next) => {
           .sort({ createdAt: sort })
           .populate({
             path: 'user',
-            select: 'name avatar',
+            select: 'userName avatar'
           })
 
         successHandler(
@@ -84,7 +84,7 @@ exports.getPostHandler = async (req, res, next) => {
           .sort({ createdAt: sort })
           .populate({
             path: 'user',
-            select: 'name avatar',
+            select: 'userName avatar'
           })
 
         successHandler(
@@ -134,7 +134,6 @@ exports.createNewPostHandler = async (req, res, next) => {
 
   try {
     const newPost = await Post.create({
-      // name: reqData.name,
       user: reqData.user,
       tags: reqData.tags,
       type: reqData.type,
@@ -192,6 +191,10 @@ exports.deletePostHandler = async (req, res, next) => {
   else {
     try {
       const deletePost = await Post.findByIdAndDelete({ _id: params.postId })
+        .populate({
+          path: 'user',
+          select: 'userName avatar'
+        })
       if (!deletePost) throw new Error(`Cannot find the post by this Id.`)
       successHandler(
         res,

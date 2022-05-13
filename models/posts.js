@@ -12,16 +12,15 @@ const schemaOptions = {
   versionKey: false,
 }
 
+// Ref collection schema
+const user = {
+  ref: 'users',
+  type: Schema.Types.ObjectId,
+  required: [true, 'user is required.'],
+}
+
 const postSchema = new Schema({
-  // name: {
-  //   type: String,
-  //   required: [true, `'name' is required.`]
-  // },
-  user: {
-    type: Schema.Types.ObjectId,
-    required: [true, 'user is required.'],
-    ref: 'users',
-  },
+  user,
   tags: {
     type: [String],
     default: undefined,
